@@ -1,10 +1,23 @@
-import Login from "./Login";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// Student Pages
+import Signup from "./pages/student/Signup";
+import Login from "./pages/student/Login";
+import Dashboard from "./pages/student/Dashboard";
 
 function App() {
   return (
-    <div>
-      <Login />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Default Page */}
+        <Route path="/" element={<Signup />} />
+
+        {/* Student Pages */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/student-dashboard" element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
