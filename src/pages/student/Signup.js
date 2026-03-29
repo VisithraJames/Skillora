@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Signup() {
   const [form, setForm] = useState({
@@ -9,6 +10,8 @@ function Signup() {
     confirmPassword: ""
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -18,13 +21,37 @@ function Signup() {
       alert("Passwords do not match ❌");
       return;
     }
+
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+
+    const existingUser = users.find((u) => u.email === form.email);
+    if (existingUser) {
+      alert("User already exists ⚠️");
+      return;
+    }
+
+    const newUser = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      password: form.password.trim(),
+      role: "student"
+    };
+
+    users.push(newUser);
+    localStorage.setItem("users", JSON.stringify(users));
+
+    localStorage.setItem("currentUser", JSON.stringify(newUser));
+
     alert("Signup Successful 🚀");
-    console.log(form);
+
+    navigate("/student-dashboard");
   };
 
   return (
     <div style={styles.container}>
-        <div style={styles.glitter}></div>
+      <div style={styles.glitter}></div>
+
       <div style={styles.card}>
         <h1 style={styles.logo}>Skillora</h1>
         <p style={styles.subtitle}>Create your account</p>
@@ -76,6 +103,8 @@ function Signup() {
     </div>
   );
 }
+
+// ✅ Styles OUTSIDE component
 const styles = {
   container: {
     height: "100vh",
@@ -87,7 +116,6 @@ const styles = {
     overflow: "hidden",
   },
 
-  // ✨ Glitter overlay
   glitter: {
     position: "absolute",
     width: "100%",
@@ -97,11 +125,10 @@ const styles = {
       radial-gradient(circle, rgba(192,192,192,0.5) 1px, transparent 1px)
     `,
     backgroundSize: "50px 50px, 80px 80px",
-    animation: "sparkle 4s linear infinite",
   },
 
   card: {
-    background: "rgba(248,250,252,0.95)", // silver glass effect
+    background: "rgba(248,250,252,0.95)",
     backdropFilter: "blur(10px)",
     padding: "40px",
     borderRadius: "12px",

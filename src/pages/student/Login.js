@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [form, setForm] = useState({
@@ -7,6 +8,8 @@ function Login() {
     role: "student"
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -14,24 +17,39 @@ function Login() {
   const handleLogin = () => {
     const users = JSON.parse(localStorage.getItem("users")) || [];
 
+    // ⭐ Trim input (important fix)
+    const email = form.email.trim();
+    const password = form.password.trim();
+
+    // ⭐ Find user (no role check here)
     const user = users.find(
-      (u) =>
-        u.email === form.email &&
-        u.password === form.password &&
-        u.role === form.role
+      (u) => u.email === email && u.password === password
     );
 
     if (user) {
       alert("Login Successful 🚀");
 
-      // Redirect based on role
-      if (form.role === "student") {
-        window.location.href = "/student-dashboard";
-      } else if (form.role === "recruiter") {
-        window.location.href = "/recruiter-dashboard";
-      } else {
-        window.location.href = "/academy-dashboard";
+      // ⭐ Save logged-in user
+      localStorage.setItem("currentUser", JSON.stringify(user));
+
+      // ⭐ Use stored role (NOT dropdown role)
+      const role = user.role;
+
+      // ⭐ Navigate based on actual user role
+      switch (role) {
+        case "student":
+          navigate("/student-dashboard");
+          break;
+        case "recruiter":
+          navigate("/recruiter-dashboard");
+          break;
+        case "academy":
+          navigate("/academy-dashboard");
+          break;
+        default:
+          navigate("/");
       }
+
     } else {
       alert("Invalid Credentials ❌");
     }
@@ -45,7 +63,7 @@ function Login() {
         <h1 style={styles.logo}>Skillora</h1>
         <p style={styles.subtitle}>Login to your account</p>
 
-        {/* Role Selection */}
+        {/* Role selection (optional now) */}
         <select
           name="role"
           style={styles.input}
